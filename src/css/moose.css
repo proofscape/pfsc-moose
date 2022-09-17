@@ -1,0 +1,1029 @@
+/* ------------------------------------------------------------------------- *
+ *  Proofscape Moose                                                         *
+ *                                                                           *
+ *  Copyright (c) 2011-2022 Proofscape contributors                          *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *      http://www.apache.org/licenses/LICENSE-2.0                           *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ * ------------------------------------------------------------------------- */
+
+div.mooseErrorBox {
+    position: absolute;
+    display: none;
+    top: 10px;
+    left: 10px;
+    font-size: 12pt;
+    font-weight: bold;
+    font-family: sans-serif;
+    color: red;
+    padding: 5px;
+    background: white;
+    border: 1px solid black;
+}
+
+div.mooseSubtitleBoxContainer {
+    position: absolute;
+    overflow-x: auto;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+    font-size: 20px;
+    z-index: 100;
+    pointer-events: none;
+}
+
+div.mooseSubtitleBox {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 16px;
+    color: #333;
+    background: #eee;
+    opacity: 0.8;
+    font-family: monospace;
+    cursor: text;
+    user-select: text;
+    pointer-events: initial;
+}
+
+.themeDark div.mooseSubtitleBox {
+    color: #eee;
+    background-color: #111;
+}
+
+div.mooseNode {
+    position: absolute;
+    font-family: serif;
+    cursor: pointer;
+    user-select: none;
+    color: black;
+}
+
+div.mooseNode.progress {
+    cursor: progress;
+}
+
+div.popupBox {
+    position: fixed;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    transform-origin: 0 0;
+}
+
+div.popupBox.opaque {
+    background-color: #ddd;
+}
+
+.themeDark div.popupBox.opaque {
+    background-color: #444;
+}
+
+.previewHolder {
+    position: relative;
+    padding: 4px;
+    margin: 4px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.themeDark .previewHolder {
+    background: #2b2b2b;
+}
+
+div.mooseNode.cloneNode {
+    position: relative;
+    border: 1px solid #FC0;
+    margin: 4px 4px;
+}
+
+.themeDark .mooseNode {
+    color: #adadad;
+}
+
+div.mooseInvisNode {
+    display: none;
+}
+
+div.clarAvail {
+    position: absolute;
+    top: -7px;
+    right: -8px;
+    display: none;
+    background: url("clarify.png");
+    width: 16px;
+    height: 16px;
+}
+
+.mooseNodeCheckbox {
+    position: absolute;
+    top: -14px;
+    right: 9px;
+    /* opacity: 0.75; */
+    filter: drop-shadow(-1px 1px 2px #585858);
+}
+
+/*
+.mooseNodeCheckbox:hover {
+    opacity: 1;
+}
+*/
+
+.themeDark .mooseNodeCheckbox {
+    filter: drop-shadow(-1px 1px 2px #111);
+}
+
+.mooseNodeCheckboxSocket {
+    position: absolute;
+}
+
+.goalBoxesHidden .mooseNodeCheckbox {
+    display: none;
+}
+
+.hidden .goalbox.checked .checkmark {
+    visibility: hidden;
+}
+
+.mooseUnderConstructionNode {
+    background-image: url("uncon72.png");
+    background-repeat: no-repeat;
+    width: 72px;
+    height: 72px;
+}
+
+div.workingGIF {
+    position: absolute;
+    z-index: 200;
+    background: url("Spinner-1s-200px.gif");
+    width: 200px;
+    height: 200px;
+    display: none;
+}
+
+.themeDark div.workingGIF {
+    background: url("Spinner-1s-200px-dk.gif");
+}
+
+.cornerIcon {
+    background-image: url("tl2c.png");
+    background-repeat: no-repeat;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 3px;
+}
+
+.themeDark .cornerIcon {
+    background-image: url("tl2c_dark.png");
+}
+
+.trIcon {
+    transform: rotate(90deg);
+}
+
+.brIcon {
+    transform: rotate(180deg);
+}
+
+.blIcon {
+    transform: rotate(270deg);
+}
+
+
+.srcR stop.src {
+    stop-color: #F88;
+}
+
+.srcY stop.src {
+    stop-color: #FF0;
+}
+
+.srcG stop.src {
+    stop-color: #8F8;
+}
+
+.srcB stop.src {
+    stop-color: #8FF;
+}
+
+.srcV stop.src {
+    stop-color: #88F;
+}
+
+
+.tgtR stop.tgt {
+    stop-color: #F88;
+}
+
+.tgtY stop.tgt {
+    stop-color: #FF0;
+}
+
+.tgtG stop.tgt {
+    stop-color: #8F8;
+}
+
+.tgtB stop.tgt {
+    stop-color: #8FF;
+}
+
+.tgtV stop.tgt {
+    stop-color: #88F;
+}
+
+
+.mooseNode.olR > .mooseNodeGlow {
+    border-color: #F88;
+    opacity: 0.5;
+}
+
+.mooseNode.olY > .mooseNodeGlow {
+    border-color: #FF0;
+    opacity: 0.5;
+}
+
+.mooseNode.olG > .mooseNodeGlow {
+    border-color: #8F8;
+    opacity: 0.5;
+}
+
+.mooseNode.olB > .mooseNodeGlow {
+    border-color: #8FF;
+    opacity: 0.5;
+}
+
+.mooseNode.olV > .mooseNodeGlow {
+    border-color: #88F;
+    opacity: 0.5;
+}
+
+
+.mooseNode.bgR > .mooseNodeBg {
+    background: #F88;
+    opacity: 1;
+}
+
+.mooseNode.bgY > .mooseNodeBg {
+    background: #FE8;
+    opacity: 1;
+}
+
+.mooseNode.bgG > .mooseNodeBg {
+    background: #8F8;
+    opacity: 1;
+}
+
+.mooseNode.bgB > .mooseNodeBg {
+    background: #8FF;
+    opacity: 1;
+}
+
+.mooseNode.bgV > .mooseNodeBg {
+    background: #88F;
+    opacity: 1;
+}
+
+.themeDark .mooseNode.bgR > .mooseNodeBg {
+    background: #552d2d;
+    opacity: 1;
+}
+
+.themeDark .mooseNode.bgY > .mooseNodeBg {
+    background: #874;
+    opacity: 1;
+}
+
+.themeDark .mooseNode.bgG > .mooseNodeBg {
+    background: #244524;
+    opacity: 1;
+}
+
+.themeDark .mooseNode.bgB > .mooseNodeBg {
+    background: #284b4b;
+    opacity: 1;
+}
+
+.themeDark .mooseNode.bgV > .mooseNodeBg {
+    background: #30284b;
+    opacity: 1;
+}
+
+.themeDark .mooseNode.bgR {
+    color: #f8f8f8;
+}
+
+.themeDark .mooseNode.bgY {
+    color: #f8f8f8;
+}
+
+.themeDark .mooseNode.bgG {
+    color: #f8f8f8;
+}
+
+.themeDark .mooseNode.bgB {
+    color: #f8f8f8;
+}
+
+.themeDark .mooseNode.bgV {
+    color: #f8f8f8;
+}
+
+
+
+span.nodelink {
+    color: blue;
+    cursor: pointer;
+}
+
+.themeDark span.nodelink {
+    color: #71b8ef;
+}
+
+span.nodelink:hover {
+    text-decoration: underline;
+}
+
+/*
+div.mooseNode:hover > img.clarAvail {
+    display: block;
+}
+*/
+
+div.clarifiable > div.clarAvail {
+    display: block;
+}
+
+div.exisLabel {
+    line-height: 2;
+}
+
+span.mooseMonospace {
+    font-family: monospace;
+}
+
+span.typeBox {
+    border: 3px solid black;
+    padding: 1px;
+}
+
+.mooseGraphArea {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    cursor: move;
+    background-color: white;
+}
+
+.mooseNodeBg {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    background-color: white;
+}
+
+.themeDark .mooseNodeBg {
+    background-color: #2b2b2b;
+}
+
+.mooseNode-ded > .mooseNodeBg {
+    background-color: gray;
+    opacity: 0.1;
+}
+
+.themeDark .mooseNode-ded > .mooseNodeBg {
+    background-color: gray;
+    opacity: 0.1;
+}
+
+.mooseNode-subded > .mooseNodeBg {
+    background-color: gray;
+    opacity: 0.1;
+}
+
+.themeDark .mooseNode-subded > .mooseNodeBg {
+    background-color: gray;
+    opacity: 0.1;
+}
+
+.mooseUconNode .mooseNodeBg {
+    visibility: none;
+}
+
+.mooseNodeHexagonPath {
+    stroke: black;
+    stroke-width: 1.2;
+    fill: none;
+}
+
+.themeDark .mooseNodeHexagonPath {
+    stroke: #adadad;
+}
+
+.mooseNodeGlow {
+    position: absolute;
+    opacity: 0;
+    border-color: #8FF;
+    border-style: solid;
+}
+
+
+tr.mooseTrailMapRow {
+    cursor: pointer;
+    font-weight: normal;
+    color: #555;
+    background: #fff;
+}
+
+tr.mooseTrailMapRow:hover {
+    background: #ddd;
+}
+
+tr.mooseTrailMapRowBrushed {
+    background: #cff;
+}
+
+tr.mooseTrailMapRowBrushed:hover {
+    background: #add;
+}
+
+tr.mooseTrailMapRowOpen {
+    font-weight: bold;
+    color: black;
+}
+
+.dormant {
+    opacity: 0.5;
+}
+
+.dormant:hover {
+    opacity: 1;
+}
+
+.deducNameLabel {
+    font-size: 10pt;
+    font-weight: bold;
+    font-family: serif;
+    margin-top: 3px;
+    margin-left: 4px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+div.lineref {
+    font-family: monospace;
+}
+
+.connector {
+    display: none;
+    fill: none;
+    stroke: black;
+    stroke-width: 1.5;
+}
+
+.theorymap .connector {
+    stroke: royalblue;
+}
+
+.themeDark .connector {
+    stroke: #adadad;
+}
+
+.themeDark .theorymap .connector {
+    stroke: lightskyblue;
+}
+
+.connGlow {
+    display: none;
+    fill: none;
+    /* stroke: #8FF; */
+    stroke-width: 10;
+    opacity: 0.5;
+}
+
+.connFlow .connector {
+    stroke-dasharray: 1,5;
+}
+
+.connFlow .connGlow {
+    /* stroke: #FF0; */
+}
+
+.connHead {
+    display: none;
+    stroke: black;
+}
+
+.theorymap .connHead {
+    stroke: royalblue;
+}
+
+.themeDark .connHead {
+    stroke: #adadad;
+}
+
+.themeDark .theorymap .connHead {
+    stroke: lightskyblue;
+}
+
+.connHeadSolid {
+    fill: black;
+    stroke-width: 1px;
+}
+
+.connHeadHollow {
+    fill: none;
+    stroke-width: 1.5px;
+}
+
+.showAllConns .connector {
+    display: inline;
+}
+
+.showAllConns .connHead {
+    display: inline;
+}
+
+.showAllConns .highlighted .connGlow {
+    display: inline;
+}
+
+.showSelConns .highlighted .connector {
+    display: inline;
+}
+
+.showSelConns .highlighted .connHead {
+    display: inline;
+}
+
+.mooseNode .edgeLayer {
+    pointer-events: none;
+    position: absolute;
+    overflow: visible;
+    width: 100%;
+    height: 100%;
+    top: -13px;
+    left: -13px;
+}
+
+.OrderedList1 .mooseNode .edgeLayer {
+    top: 0px;
+    left: 0px;
+}
+
+.themeDark .mooseGraphArea {
+    background-color: #2b2b2b;
+}
+
+.mooseNode-asrt {
+    border-style: solid;
+    border-color: black;
+    color: black;
+}
+
+.mooseNode-cite {
+    border-style: solid;
+    border-color: black;
+    color: black;
+}
+
+.mooseNode-ded {
+    border-style: solid;
+    border-color: gray;
+    color: black;
+}
+
+.mooseNode-dummy {
+    border-style: none;
+    border-color: black;
+    color: black;
+}
+
+.mooseNode-exis {
+    border-style: solid;
+    border-color: black;
+    color: black;
+}
+
+.mooseNode-flse {
+    border-style: solid;
+    border-color: black;
+    color: black;
+}
+
+.mooseNode-ghost {
+    border-style: dashed;
+    border-color: gray;
+    color: gray;
+}
+
+.mooseNode-intr {
+    border-style: solid;
+    border-color: black;
+    color: black;
+}
+
+.mooseNode-mthd {
+    border-style: solid;
+    border-color: black;
+    color: black;
+}
+
+.mooseNode-qstn {
+    border-style: dashed;
+    border-color: gray;
+    color: gray;
+}
+
+.mooseNode-rels {
+    border-style: solid;
+    border-color: black;
+    color: black;
+}
+
+.mooseNode-subded {
+    border-style: solid;
+    border-color: gray;
+    color: black;
+}
+
+.mooseNode-supp {
+    border-style: dashed;
+    border-color: black;
+    color: black;
+}
+
+.mooseNode-ucon {
+    border-style: none;
+    border-color: black;
+    color: black;
+}
+
+.mooseNode-univ {
+    border-style: solid;
+    border-color: black;
+    color: black;
+}
+
+.mooseNode-with {
+    border-style: solid;
+    border-color: black;
+    color: black;
+}
+
+.theorymap .mooseNode {
+    border-color: royalblue;
+}
+
+.themeDark .theorymap .mooseNode {
+    border-color: lightskyblue;
+}
+
+
+.themeDark .mooseNode-asrt {
+    border-color: #adadad;
+    color: #adadad;
+}
+
+.themeDark .mooseNode-cite {
+    border-color: #adadad;
+    color: #adadad;
+}
+
+.themeDark .mooseNode-ded {
+    border-color: gray;
+    color: #adadad;
+}
+
+.themeDark .mooseNode-dummy {
+    border-color: #adadad;
+    color: #adadad;
+}
+
+.themeDark .mooseNode-exis {
+    border-color: #adadad;
+    color: #adadad;
+}
+
+.themeDark .mooseNode-flse {
+    border-color: #adadad;
+    color: #adadad;
+}
+
+.themeDark .mooseNode-ghost {
+    border-color: gray;
+    color: gray;
+}
+
+.themeDark .mooseNode-intr {
+    border-color: #adadad;
+    color: #adadad;
+}
+
+.themeDark .mooseNode-mthd {
+    border-color: #adadad;
+    color: #adadad;
+}
+
+.themeDark .mooseNode-qstn {
+    border-color: gray;
+    color: gray;
+}
+
+.themeDark .mooseNode-rels {
+    border-color: #adadad;
+    color: #adadad;
+}
+
+.themeDark .mooseNode-subded {
+    border-color: gray;
+    color: #adadad;
+}
+
+.themeDark .mooseNode-supp {
+    border-color: #adadad;
+    color: #adadad;
+}
+
+.themeDark .mooseNode-ucon {
+    border-color: #adadad;
+    color: #adadad;
+}
+
+.themeDark .mooseNode-univ {
+    border-color: #adadad;
+    color: #adadad;
+}
+
+.themeDark .mooseNode-with {
+    border-color: #adadad;
+    color: #adadad;
+}
+
+.mooseOverviewInset {
+    position: absolute;
+    width: 240px;
+    height: 240px;
+    border-width: 4px;
+    border-radius: 4px;
+    background-color: white;
+    border-color: #999;
+    cursor: default;
+}
+
+.overviewGlass {
+    cursor: move;
+}
+
+.themeDark .mooseOverviewInset {
+    background-color: #3c3f41;
+    border-color: #2b2b2b;
+}
+
+.mooseOverviewInset-bl {
+    bottom: 0px;
+    left: 0px;
+    border-top-style: solid;
+    border-right-style: solid;
+    padding: 8px 8px 0px 0px;
+}
+
+.mooseOverviewInset-tl {
+    top: 0px;
+    left: 0px;
+    border-bottom-style: solid;
+    border-right-style: solid;
+    padding: 0px 8px 8px 0px;
+}
+
+.mooseOverviewInset-br {
+    bottom: 0px;
+    right: 0px;
+    border-top-style: solid;
+    border-left-style: solid;
+    padding: 8px 0px 0px 8px;
+}
+
+.mooseOverviewInset-tr {
+    top: 0px;
+    right: 0px;
+    border-bottom-style: solid;
+    border-left-style: solid;
+    padding: 0px 0px 8px 8px;
+}
+
+.mooseInsetTabGroup {
+    opacity: 0;
+    position: absolute;
+    height: 16px;
+    padding-left: 5px;
+}
+
+.mooseInsetTabGroup:hover {
+    opacity: 1;
+}
+
+.mooseOverviewInset:hover .mooseInsetTabGroup {
+    opacity: 1;
+}
+
+.mooseOverviewInset:hover .mooseInsetTabGroup.tabGroupQuiet {
+    opacity: 0;
+}
+
+.mooseOverviewInset-bl .mooseInsetTabGroup,
+.mooseOverviewInset-br .mooseInsetTabGroup {
+    top: -22px;
+}
+
+.mooseOverviewInset-tl .mooseInsetTabGroup,
+.mooseOverviewInset-tr .mooseInsetTabGroup {
+    bottom: -20px;
+}
+
+.mooseInsetTab {
+    padding: 4px;
+    cursor: pointer;
+    background-color: #dcdcdc;
+}
+
+.themeDark .mooseInsetTab {
+    background-color: #282828;
+}
+
+.mooseOverviewInset-bl .mooseInsetTab,
+.mooseOverviewInset-br .mooseInsetTab {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.mooseOverviewInset-tl .mooseInsetTab,
+.mooseOverviewInset-tr .mooseInsetTab {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.mooseInsetTab-selected {
+    background: #fff;
+    border-left: 1px solid;
+    border-right: 1px solid;
+    color: #048;
+    border-left-color: #686868;
+    border-right-color: #686868;
+}
+
+.themeDark .mooseInsetTab-selected {
+    background: #444;
+    color: #8ad;
+}
+
+.mooseOverviewInset-bl .mooseInsetTab-selected,
+.mooseOverviewInset-br .mooseInsetTab-selected {
+    border-top: 2px solid;
+    padding-top: 6px;
+    border-top-color: #04c;
+}
+
+.mooseOverviewInset-tl .mooseInsetTab-selected,
+.mooseOverviewInset-tr .mooseInsetTab-selected {
+    border-bottom: 2px solid;
+    padding-bottom: 6px;
+    border-bottom-color: #04c;
+}
+
+.mooseInsetContentPane {
+    display: none;
+}
+
+.mooseInsetContentPane-selected {
+    display: block;
+}
+
+.mooseOverviewNodeBox {
+    cursor: pointer;
+    fill: white;
+    opacity: 1;
+}
+
+.themeDark .mooseNbhdview .mooseOverviewNodeBox {
+    opacity: 0.8;
+}
+
+.mooseOverviewNodeBox.faded {
+    opacity: 0.4;
+}
+
+.themeDark .mooseOverviewNodeBox.faded {
+    opacity: 0.25;
+}
+
+.mooseOverviewNodeBox.mooseOverviewNodeBox-ded {
+    fill: gray;
+    opacity: 0.1;
+}
+
+.mooseOverviewNodeBox-ded.olR,
+.mooseOverviewNodeBox-ded.olY,
+.mooseOverviewNodeBox-ded.olG,
+.mooseOverviewNodeBox-ded.olB,
+.mooseOverviewNodeBox-ded.olV,
+.mooseOverviewNodeBox-ded.bgR,
+.mooseOverviewNodeBox-ded.bgY,
+.mooseOverviewNodeBox-ded.bgG,
+.mooseOverviewNodeBox-ded.bgB,
+.mooseOverviewNodeBox-ded.bgV {
+    opacity: 0.5;
+}
+
+.mooseOverviewNodeBox.olR {
+    fill: #F88;
+}
+
+.mooseOverviewNodeBox.olY {
+    fill: #FF0;
+}
+
+.mooseOverviewNodeBox.olG {
+    fill: #8F8;
+}
+
+.mooseOverviewNodeBox.olB {
+    fill: #8FF;
+}
+
+.mooseOverviewNodeBox.olV {
+    fill: #88F;
+}
+
+.mooseOverviewNodeBox.bgR {
+    fill: #F88;
+}
+
+.mooseOverviewNodeBox.bgY {
+    fill: #FF0;
+}
+
+.mooseOverviewNodeBox.bgG {
+    fill: #8F8;
+}
+
+.mooseOverviewNodeBox.bgB {
+    fill: #8FF;
+}
+
+.mooseOverviewNodeBox.bgV {
+    fill: #88F;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.mooseNode-prefix {
+    font-family: sans-serif;
+    font-size: 11px;
+    font-variant: small-caps;
+    margin-right: 5px;
+    border-right: 1px dashed;
+    border-bottom: 1px dashed;
+    border-radius: 1px;
+    padding-right: 3px;
+    padding-bottom: 2px;
+    display: inline-block;
+}
+
+div.pdf-render {
+    margin: 4px 0px 0px 4px;
+}
+
+.themeDark div.pdf-render {
+    filter: invert(0.83);
+}
+
+.mooseNode p {
+    margin-block-start: 0;
+    margin-block-end: 0;
+}
+
+table.mooseRdefs td {
+    padding-right: 6px;
+    padding-bottom: 3px;
+}
+
+table.mooseRdefs td.dfdm {
+    text-align: right;
+}
+
+table.mooseRdefs td.dfns {
+    text-align: left;
+}

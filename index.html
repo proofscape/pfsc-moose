@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Test Moose</title>
+  </head>
+  <body class="claro themeDark" style="margin:0px;">
+    <div id="mga" class="mooseGraphArea"></div>
+    <!-- MathJax2 config. How much of this do we actually need to put in the MathJax3 config?
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        showMathMenu: false,
+        extensions: ["tex2jax.js", "TeX/AMSmath.js"],
+        jax: ["input/TeX", "output/SVG"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\\\(","\\\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\\\[","\\\\]"] ],
+          processEscapes: true
+        },
+        "SVG": { availableFonts: ["TeX"] },
+        TeX: {
+            Macros: {
+                slash: "/"
+            }
+        }
+      });
+    </script>
+    -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        svg: {
+          fontCache: 'global'
+        }
+      };
+    </script>
+    <script src="dist/mathjax/tex-svg.js"></script>
+    <script src="dist/main.bundle.js"></script>
+  </body>
+</html>
