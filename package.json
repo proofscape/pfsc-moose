@@ -2,7 +2,7 @@
   "name": "pfsc-moose",
   "version": "0.22.10-dev",
   "license": "Apache-2.0",
-  "author" : "Steve Kieffer",
+  "author": "Steve Kieffer",
   "description": "Moose is a forest browser.",
   "repository": {
     "type": "git",
