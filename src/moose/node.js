@@ -61,8 +61,8 @@ var Node = function() {
 
     this.ghostInfo = {};
 
-    this.pdfRef = null;
-    this.pdfFingerprint = null;
+    this.docRef = null;
+    this.docFingerprint = null;
 
     this.rdefHTML = '';
     this.numRdefs = 0;
@@ -744,8 +744,8 @@ Node.prototype = {
         this.cfOut = d.cf_out || [];
         this.userNotes = d.user_notes;
 
-        this.pdfRef = d.pdfRef;
-        this.pdfFingerprint = d.pdfFingerprint;
+        this.docRef = d.docRef;
+        this.docId = d.docId
 
         // Running defs
         if (this.isDeduc()) {

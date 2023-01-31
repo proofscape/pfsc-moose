@@ -1002,11 +1002,11 @@ div.lineref {
     display: inline-block;
 }
 
-div.pdf-render {
+div.doc-render {
     margin: 4px 0px 0px 4px;
 }
 
-.themeDark div.pdf-render {
+.themeDark div.doc-render {
     filter: invert(0.83);
 }
 
