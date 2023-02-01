@@ -653,6 +653,36 @@ Forest.prototype = {
         return Object.keys(this.deducs);
     },
 
+    /* Return a single docInfo object, merging the info from all open deducs.
+     */
+    getMergedDocInfos : function() {
+        const mergedInfo = {
+            docs: new Map(),
+            refs: new Map(),
+        };
+        for (let deducId of Object.keys(this.deducs)) {
+            const deduc = this.deducs[deducId];
+            const deducInfo = deduc.getDeducInfo();
+            const newInfo = deducInfo.docInfo || {docs: {}, refs: {}};
+            const newDocs = newInfo.docs;
+            const newRefs = newInfo.refs;
+            // Adopt those doc infos that we don't have yet:
+            for (let docId of Object.keys(newDocs)) {
+                if (!mergedInfo.docs.has(docId)) {
+                    mergedInfo.docs.set(docId, newDocs[docId]);
+                }
+            }
+            // Merge lists of doc refs:
+            for (let docId of Object.keys(newRefs)) {
+                if (!mergedInfo.refs.has(docId)) {
+                    mergedInfo.refs.set(docId, []);
+                }
+                mergedInfo.refs.get(docId).push(...newRefs[docId]);
+            }
+        }
+        return mergedInfo;
+    },
+
     getAllVisibleNodes : function(options) {
         var v = {};
         for (var uid in this.nodes) {
