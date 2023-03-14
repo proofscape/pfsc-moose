@@ -683,6 +683,22 @@ Forest.prototype = {
         return mergedInfo;
     },
 
+    /* Return a Map in which deduc libpaths point to arrays of docIds
+     * referenced by that deduc. Array is empty for any deduc that makes
+     * no doc refs.
+     */
+    getReferencedDocIdsByDeduc : function() {
+        const m = new Map();
+        for (let deducId of Object.keys(this.deducs)) {
+            const deduc = this.deducs[deducId];
+            const deducInfo = deduc.getDeducInfo();
+            const docInfo = deducInfo.docInfo || {docs: {}, refs: {}};
+            const docIds = Array.from(Object.keys(docInfo.docs));
+            m.set(deducId, docIds);
+        }
+        return m;
+    },
+
     getAllVisibleNodes : function(options) {
         var v = {};
         for (var uid in this.nodes) {
