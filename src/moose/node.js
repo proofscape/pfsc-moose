@@ -1475,6 +1475,12 @@ Node.prototype = {
                 uid = this.uid;
             this.div.addEventListener("mousedown", function(e){theForest.getMouse().nodeMouseDown(uid, e)});
             this.div.addEventListener("click", function(e){theForest.getMouse().nodeClick(uid, e)});
+            this.div.addEventListener('mouseover', function(e) {
+                theForest.notifyNodeMouseoverListeners(uid, e);
+            });
+            this.div.addEventListener('mouseout', function(e) {
+                theForest.notifyNodeMouseoutListeners(uid, e);
+            });
             // Special handling for ghost nodes:
             if (this.isGhost()) {
                 // Double-click opens the ghosted node.

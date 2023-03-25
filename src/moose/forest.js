@@ -198,6 +198,8 @@ var Forest = function(div, params) {
     this.indexListeners = {};
     this.ghostListeners = {};
     this.nodeClickListeners = [];
+    this.nodeMouseoverListeners = [];
+    this.nodeMouseoutListeners = [];
     this.nodeDoubleClickListeners = {};
     this.bgDoubleClickListeners = {};
 
@@ -836,6 +838,14 @@ Forest.prototype = {
         this.nodeClickListeners.push(callback);
     },
 
+    addNodeMouseoverListener : function(callback) {
+        this.nodeMouseoverListeners.push(callback);
+    },
+
+    addNodeMouseoutListener : function(callback) {
+        this.nodeMouseoutListeners.push(callback);
+    },
+
     addNodeDoubleClickListener : function(L) {
         var id = L.getID();
         this.nodeDoubleClickListeners[id] = L;
@@ -872,6 +882,18 @@ Forest.prototype = {
     notifyNodeClickListeners : function(uid, e) {
         for (var i in this.nodeClickListeners) {
             var cb = this.nodeClickListeners[i];
+            cb(this, uid, e);
+        }
+    },
+
+    notifyNodeMouseoverListeners : function(uid, e) {
+        for (const cb of this.nodeMouseoverListeners) {
+            cb(this, uid, e);
+        }
+    },
+
+    notifyNodeMouseoutListeners : function(uid, e) {
+        for (const cb of this.nodeMouseoutListeners) {
             cb(this, uid, e);
         }
     },
