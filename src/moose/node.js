@@ -61,8 +61,8 @@ var Node = function() {
 
     this.ghostInfo = {};
 
-    this.pdfRef = null;
-    this.pdfFingerprint = null;
+    this.docRef = null;
+    this.docFingerprint = null;
 
     this.rdefHTML = '';
     this.numRdefs = 0;
@@ -744,8 +744,8 @@ Node.prototype = {
         this.cfOut = d.cf_out || [];
         this.userNotes = d.user_notes;
 
-        this.pdfRef = d.pdfRef;
-        this.pdfFingerprint = d.pdfFingerprint;
+        this.docRef = d.docRef;
+        this.docId = d.docId
 
         // Running defs
         if (this.isDeduc()) {
@@ -1475,6 +1475,12 @@ Node.prototype = {
                 uid = this.uid;
             this.div.addEventListener("mousedown", function(e){theForest.getMouse().nodeMouseDown(uid, e)});
             this.div.addEventListener("click", function(e){theForest.getMouse().nodeClick(uid, e)});
+            this.div.addEventListener('mouseover', function(e) {
+                theForest.notifyNodeMouseoverListeners(uid, e);
+            });
+            this.div.addEventListener('mouseout', function(e) {
+                theForest.notifyNodeMouseoutListeners(uid, e);
+            });
             // Special handling for ghost nodes:
             if (this.isGhost()) {
                 // Double-click opens the ghosted node.

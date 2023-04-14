@@ -198,6 +198,8 @@ var Forest = function(div, params) {
     this.indexListeners = {};
     this.ghostListeners = {};
     this.nodeClickListeners = [];
+    this.nodeMouseoverListeners = [];
+    this.nodeMouseoutListeners = [];
     this.nodeDoubleClickListeners = {};
     this.bgDoubleClickListeners = {};
 
@@ -653,6 +655,52 @@ Forest.prototype = {
         return Object.keys(this.deducs);
     },
 
+    /* Return a single docInfo object, merging the info from all open deducs.
+     */
+    getMergedDocInfos : function() {
+        const mergedInfo = {
+            docs: new Map(),
+            refs: new Map(),
+        };
+        for (let deducId of Object.keys(this.deducs)) {
+            const deduc = this.deducs[deducId];
+            const deducInfo = deduc.getDeducInfo();
+            const newInfo = deducInfo.docInfo || {docs: {}, refs: {}};
+            const newDocs = newInfo.docs;
+            const newRefs = newInfo.refs;
+            // Adopt those doc infos that we don't have yet:
+            for (let docId of Object.keys(newDocs)) {
+                if (!mergedInfo.docs.has(docId)) {
+                    mergedInfo.docs.set(docId, newDocs[docId]);
+                }
+            }
+            // Merge lists of doc refs:
+            for (let docId of Object.keys(newRefs)) {
+                if (!mergedInfo.refs.has(docId)) {
+                    mergedInfo.refs.set(docId, []);
+                }
+                mergedInfo.refs.get(docId).push(...newRefs[docId]);
+            }
+        }
+        return mergedInfo;
+    },
+
+    /* Return a Map in which deduc libpaths point to arrays of docIds
+     * referenced by that deduc. Array is empty for any deduc that makes
+     * no doc refs.
+     */
+    getReferencedDocIdsByDeduc : function() {
+        const m = new Map();
+        for (let deducId of Object.keys(this.deducs)) {
+            const deduc = this.deducs[deducId];
+            const deducInfo = deduc.getDeducInfo();
+            const docInfo = deducInfo.docInfo || {docs: {}, refs: {}};
+            const docIds = Array.from(Object.keys(docInfo.docs));
+            m.set(deducId, docIds);
+        }
+        return m;
+    },
+
     getAllVisibleNodes : function(options) {
         var v = {};
         for (var uid in this.nodes) {
@@ -790,6 +838,14 @@ Forest.prototype = {
         this.nodeClickListeners.push(callback);
     },
 
+    addNodeMouseoverListener : function(callback) {
+        this.nodeMouseoverListeners.push(callback);
+    },
+
+    addNodeMouseoutListener : function(callback) {
+        this.nodeMouseoutListeners.push(callback);
+    },
+
     addNodeDoubleClickListener : function(L) {
         var id = L.getID();
         this.nodeDoubleClickListeners[id] = L;
@@ -826,6 +882,18 @@ Forest.prototype = {
     notifyNodeClickListeners : function(uid, e) {
         for (var i in this.nodeClickListeners) {
             var cb = this.nodeClickListeners[i];
+            cb(this, uid, e);
+        }
+    },
+
+    notifyNodeMouseoverListeners : function(uid, e) {
+        for (const cb of this.nodeMouseoverListeners) {
+            cb(this, uid, e);
+        }
+    },
+
+    notifyNodeMouseoutListeners : function(uid, e) {
+        for (const cb of this.nodeMouseoutListeners) {
             cb(this, uid, e);
         }
     },
