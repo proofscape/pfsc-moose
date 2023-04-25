@@ -99,10 +99,36 @@ div.popupBox.opaque {
     background: #2b2b2b;
 }
 
-div.mooseNode.cloneNode {
+/* We have two notions of "clone":
+ *
+ *  - Any HTML element has a `cloneNode()` method, and when we apply
+ *    this to a `mooseNode` (as in `Forest.makeNodeClonePopup()`) we
+ *    refer to the result as a `mooseNodeHtmlClone`.
+ *
+ *  - There is a special type of `mooseNode` known as a "clone node",
+ *    which is a copy of another node, living somewhere else in the
+ *    universal graph, and which bears a reference to that original.
+ *    We refer to such nodes as `mooseCloneNode`.
+ *
+ * Thus, one thing is a momentary result of manipulating HTML elements;
+ * the other is a part of the Moose node type system.
+ */
+
+div.mooseNode.mooseNodeHtmlClone {
     position: relative;
     border: 1px solid #FC0;
     margin: 4px 4px;
+}
+
+/* For now we're using the same styling for `mooseCloneNode` as for `theoryMap`,
+ * in giving them blue borders, since they are both "meta elements" of a kind.
+ */
+div.mooseCloneNode {
+    border-color: royalblue;
+}
+
+.themeDark div.mooseCloneNode {
+    border-color: lightskyblue;
 }
 
 .themeDark .mooseNode {

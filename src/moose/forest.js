@@ -973,9 +973,9 @@ Forest.prototype = {
                 let nodeDiv = node.getDiv(),
                     doCloneChildren = true,
                     clone = nodeDiv.cloneNode(doCloneChildren);
-                clone.classList.add('cloneNode');
+                clone.classList.add('mooseNodeHtmlClone');
                 // It's not enough to make `left` and `top` settings for the
-                // `cloneNode` CSS class; we have to override direct settings
+                // `mooseNodeHtmlClone` CSS class; we have to override direct settings
                 // that have already been made on the element we cloned.
                 clone.style.left = '0';
                 clone.style.top = '0';

@@ -64,6 +64,8 @@ var Node = function() {
     this.docRef = null;
     this.docFingerprint = null;
 
+    this.cloneOf = null;
+
     this.rdefHTML = '';
     this.numRdefs = 0;
 
@@ -747,6 +749,8 @@ Node.prototype = {
         this.docRef = d.docRef;
         this.docId = d.docId
 
+        this.cloneOf = d.cloneOf;
+
         // Running defs
         if (this.isDeduc()) {
             let rdefs = deducInfo.getRunningDefs(),
@@ -1186,6 +1190,10 @@ Node.prototype = {
             // new nodes (and only draws new links). If we didn't make the div invisible, it would
             // just appear as a little square with no label and no contents at all.
             div.classList.add('mooseInvisNode');
+        }
+        // Is it a clone?
+        if (this.cloneOf) {
+            div.classList.add('mooseCloneNode');
         }
         // Add the node type.
         div.classList.add('mooseNode-' + this.nodetype);
