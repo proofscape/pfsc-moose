@@ -56,7 +56,7 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *
  *      The system will automatically ensure first that any boxes to be viewed are actually
  *      present, opening deducs as necessary to achieve this, and then will update the
- *      viewbox to show these boxes. The `view` parameter therefore often makes use of
+ *      viewbox to show these boxes. The `view` parameter therefore often makes
  *      the `on_board` parameter unnecessary (see below).
  *
  *      You may pass a boxlisting, or keyword 'all' indicating that you want to view
@@ -215,7 +215,7 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *      In such cases you may pass a truthy value for `local`.
  *
  *      When you do pass a truthy value for `local`, you can still open and close
- *      deducs, but you must understand that the responsbility to make a request that will
+ *      deducs, but you must understand that the responsibility to make a request that will
  *      work rests on you. In particular:
  *
  *          * You may name both nodes and deducs in `off_board`.
