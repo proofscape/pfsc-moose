@@ -985,7 +985,7 @@ Floor.prototype = {
      *
      *      Default: 'named'
      *
-     * center: Indicates on which objects the view should be centered _if centering_. (See `pan_policy` below.)
+     * center: Indicates on which objects the view should be centered _if centering_. (See `panPolicy` below.)
      *      May be either an array of libpaths, or else one of the keywords:
      *          'all': center on all the nodes named in `objects`
      *          'core': center on all the nodes named in `core`
@@ -996,26 +996,26 @@ Floor.prototype = {
      *
      *      Default: 'all'
      *
-     * viewbox_padding_px: Set a constant padding for the viewbox, in pixels.
+     * viewboxPaddingPx: Set a constant padding for the viewbox, in pixels.
      *
      *      Default: undefined
      *
-     * viewbox_padding_percent: Set a variable padding as a percentage of the corresponding viewbox dimension (x or y).
+     * viewboxPaddingPercent: Set a variable padding as a percentage of the corresponding viewbox dimension (x or y).
      *
      *      Default: 5%.
      *
-     * max_zoom: The view will not be zoomed in any more than this, even if all the nodes to be viewed could
+     * maxZoom: The view will not be zoomed in any more than this, even if all the nodes to be viewed could
      *      fit in the padded viewbox at a closer zoom level.
      *
      *      Default: 1.4
      *
-     * min_zoom: This is not a hard minimum. If all attempts to fit the whole set of objects to be viewed into
+     * minZoom: This is not a hard minimum. If all attempts to fit the whole set of objects to be viewed into
      *      view would require a zoom level less than this value (if set), then an attempt will be made to
      *      instead view the `core` set of objects (see above) at a higher zoom level.
      *
      *      Default: null (no minimum)
      *
-     * pan_policy: Must be equal to one of the constants,
+     * panPolicy: Must be equal to one of the constants,
      *          moose.autopanPolicy_CenterAlways
      *          moose.autopanPolicy_CenterNever
      *          moose.autopanPolicy_CenterDistant
@@ -1023,7 +1023,7 @@ Floor.prototype = {
      *
      *      Default: moose.autopanPolicy_CenterDistant
      *
-     * inset_aware: If there is an inset pane (such as for an overview) currently obscuring one corner of the
+     * insetAware: If there is an inset pane (such as for an overview) currently obscuring one corner of the
      *      viewbox, then we attempt to work around it.
      *
      *      The approach is simple-minded, and a more sophisticated optimization scheme awaits future work.
@@ -1040,11 +1040,11 @@ Floor.prototype = {
         var par = {
             core: 'named',
             center: 'all',
-            viewbox_padding_percent: 5,
-            max_zoom: this.forest.isInUnifiedMode() ? 1.4 : null,
-            min_zoom: null,
-            pan_policy: moose.autopanPolicy_CenterDistant,
-            inset_aware: true,
+            viewboxPaddingPercent: 5,
+            maxZoom: this.forest.isInUnifiedMode() ? 1.4 : null,
+            minZoom: null,
+            panPolicy: moose.autopanPolicy_CenterDistant,
+            insetAware: true,
         };
         // And now override with user-supplied values.
         Object.assign(par, userParams);
@@ -1109,22 +1109,22 @@ Floor.prototype = {
         //  (i)  the user has defined a `core` set, and
         //  (ii) the user has set a minimum zoom level.
         // Either of these two optional parameters is meaningless without the other.
-        var coreMode = par.core && par.min_zoom;
+        var coreMode = par.core && par.minZoom;
 
         // The second boolean we call `insetMode`, and it also means that two things are both true:
-        //  (i)  the parameter `inset_aware` is true, and
+        //  (i)  the parameter `insetAware` is true, and
         //  (ii) this window is currently showing an inset pane.
-        var insetMode = par.inset_aware && this.overviewPanelIsVisible();
+        var insetMode = par.insetAware && this.overviewPanelIsVisible();
 
         // Get all possible view rects. This is an array of length 2 or 1, according to whether
         // we are in inset mode or not, resp.
         var viewrects = this.getMaximalViewRects();
         // Set padding in all viewrects.
-        if (par.viewbox_padding_px) {
-            var p = par.viewbox_padding_px;
+        if (par.viewboxPaddingPx) {
+            var p = par.viewboxPaddingPx;
             for (var i in viewrects) viewrects[i].padByPixels(p, p);
-        } else if (par.viewbox_padding_percent) {
-            var p = par.viewbox_padding_percent;
+        } else if (par.viewboxPaddingPercent) {
+            var p = par.viewboxPaddingPercent;
             for (var i in viewrects) viewrects[i].padByPercent(p, p);
         }
         // Since there can only be one or two viewrects, it is easier to work with them by name.
@@ -1139,7 +1139,7 @@ Floor.prototype = {
             maxZ = this.computeMaximalZoomScale.bind(this),
             A = objRect,
             B = coreRect,
-            z0 = par.min_zoom;
+            z0 = par.minZoom;
         // In all cases, one possibility is that we fit realrect A into viewrect r0.
         var m0 = maxZ(A.dims(), r0.dims());
         triples.push([m0, A, r0]);
@@ -1180,7 +1180,7 @@ Floor.prototype = {
         rr = t[1];
         vr = t[2];
         // If a max zoom was set, scale down as needed.
-        if (par.max_zoom) c1 = Math.min(c1, par.max_zoom);
+        if (par.maxZoom) c1 = Math.min(c1, par.maxZoom);
 
 
         // Phase II.
@@ -1210,7 +1210,7 @@ Floor.prototype = {
         var V = this.viewrect2realrect(vr, [a0, b0, c1]);
         // Initially assume we are not centering.
         var centering = false;
-        if (par.pan_policy === moose.autopanPolicy_CenterAlways) {
+        if (par.panPolicy === moose.autopanPolicy_CenterAlways) {
             // If it is the CenterAlways policy then we are centering.
             centering = true;
         } else {
@@ -1230,7 +1230,7 @@ Floor.prototype = {
             // If we are using the CenterNever policy, then that's all there is to do.
             // But if it is the CenterDistant policy, then we need to decide whether the "inside" translation
             // counts as a "distant" one.
-            if (par.pan_policy === moose.autopanPolicy_CenterDistant) {
+            if (par.panPolicy === moose.autopanPolicy_CenterDistant) {
                 // Compute the box U in real space that would be visible under floor transform (a1, b1, c1).
                 var U = this.viewrect2realrect(vr, [a1, b1, c1]);
                 // If there is no intersection, then we consider this a "distant" move, i.e. one that throws away

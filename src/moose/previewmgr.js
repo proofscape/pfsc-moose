@@ -113,7 +113,7 @@ PreviewManager.prototype = {
                 activateNavKeys: false,
             });
             return forest.requestState({
-                on_board: deducpath,
+                onBoard: deducpath,
                 versions: {[deducpath]: version},
             }).then(() => {
                 // Deducs are stored in the Forest both as deducs, _and_ as nodes,

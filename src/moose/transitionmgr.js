@@ -37,8 +37,8 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *  {
  *      view: (see below),
  *      coords: 'fixed' or [x, y, zf],
- *      on_board: boxlisting,
- *      off_board: 'all' or boxlisting,
+ *      onBoard: boxlisting,
+ *      offBoard: 'all' or boxlisting,
  *      reload: 'all' or boxlisting,
  *      versions: (see below),
  *      select: null or true or boxlisting,
@@ -57,7 +57,7 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *      The system will automatically ensure first that any boxes to be viewed are actually
  *      present, opening deducs as necessary to achieve this, and then will update the
  *      viewbox to show these boxes. The `view` parameter therefore often makes
- *      the `on_board` parameter unnecessary (see below).
+ *      the `onBoard` parameter unnecessary (see below).
  *
  *      You may pass a boxlisting, or keyword 'all' indicating that you want to view
  *      everything currently on the board (an "overview").
@@ -98,19 +98,19 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *
  *      Default: undefined
  *
- * on_board: Name boxes that should be on board.
+ * onBoard: Name boxes that should be on board.
  *
  *      Pass any boxlisting. The system will ensure that every deduc in the deduc closure thereof
  *      is on board, opening it if necessary, or leaving it if it is already there.
  *
  *      Default: undefined
  *
- * off_board: Name boxes that should not be on board.
+ * offBoard: Name boxes that should not be on board.
  *
  *      Pass any boxlisting, or keyword 'all' indicating that you want everything presently on
  *      board to be removed.
  *
- *      If off_board contradicts on_board or view, it is overruled by them. In other words, putting
+ *      If offBoard contradicts onBoard or view, it is overruled by them. In other words, putting
  *      things on the board is favored over removing them.
  *
  *      Default: undefined
@@ -129,7 +129,7 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *      Let us say that in this case the system "rescues" deduc E. Then the order of overriding is as
  *      follows:
  *
- *              on_board, view, reload  >  off_board  >  rescue
+ *              onBoard, view, reload  >  offBoard  >  rescue
  *
  *      In other words, if the user explicitly asks that something be present, this overrides a request
  *      that it be absent. However, an explicit request that something be absent overrides a rescue.
@@ -141,11 +141,11 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *      Pass an object mapping libpaths to full version strings (i.e. either "WIP" for work-in-progress,
  *      or a numbered version of the form `vM.m.p`).
  *
- *      The mapping may speak for any libpath listed in any of the three arguments `view`, `on_board`,
+ *      The mapping may speak for any libpath listed in any of the three arguments `view`, `onBoard`,
  *      and `reload`. It is allowed to be implicit, meaning that not every libpath has to be a key,
  *      but some proper segment-wise prefix of it must be.
  *
- *      For any libpath in `view`, `on_board`, or `reload` that is not given a version by this argument,
+ *      For any libpath in `view`, `onBoard`, or `reload` that is not given a version by this argument,
  *      we will fall back on versions implied by anything already on board. If that is silent as well,
  *      it is an error.
  *
@@ -218,17 +218,17 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *      deducs, but you must understand that the responsibility to make a request that will
  *      work rests on you. In particular:
  *
- *          * You may name both nodes and deducs in `off_board`.
+ *          * You may name both nodes and deducs in `offBoard`.
  *          * You must not name any nodes (only deducs) in `reload`.
- *          * Anything named in `on_board` or `view/view.objects` that is not
+ *          * Anything named in `onBoard` or `view` that is not
  *            already present in the forest must be a deduc, not a node (since we will
  *            attempt to open it).
  *          * Any deducs that will be opened will be processed in the order
- *            given, first in `reload`, then in `on_board`, and finally in
- *            `view/view.objects`. It is up to you to ensure that this ordering
+ *            given, first in `reload`, then in `onBoard`, and finally in
+ *            `view`. It is up to you to ensure that this ordering
  *            is topological (i.e. targets come before expansions).
  *
- * flow: If true, show flow edges in deducs being opened; if false, suppress them; if
+ * flow: Boolean. If true, show flow edges in deducs being opened; if false, suppress them; if
  *      undefined, default to current setting in the Forest.
  */
 var TransitionManager = function(forest, params) {
@@ -343,9 +343,9 @@ TransitionManager.prototype = {
         }
 
         // Set up data for request to back-end.
-        var current_forest = this.forest.getFloor().writeVersionedForestRepn(),
-            on_board = params.on_board || null,
-            off_board = params.off_board || null,
+        const current_forest = this.forest.getFloor().writeVersionedForestRepn(),
+            on_board = params.onBoard || null,
+            off_board = params.offBoard || null,
             reload = params.reload || null,
             versions = params.versions || {},
             to_view = null,
