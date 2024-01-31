@@ -42,7 +42,7 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *      offBoard: 'all' or boxlisting,
  *      reload: 'all' or boxlisting,
  *      versions: (see below),
- *      select: null or true or boxlisting,
+ *      select: boolean or boxlisting,
  *      color: (see below),
  *      layout: a layout method,
  *      transition: true/false,
@@ -139,7 +139,7 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *
  *      Legal values are:
  *          - true: keep the selection as it is ("stay true")
- *          - null: clear the selection (i.e. no nodes should be selected)
+ *          - false: clear the selection (i.e. no nodes should be selected)
  *          - a boxlisting: select all the boxes in the listing
  *
  *      Default: true; however, if the `view` parameter is defined, that can override this. See above.
@@ -379,24 +379,35 @@ TransitionManager.prototype = {
      * Note: Must not call this method until after `setUpParameters()` has already been called.
      */
     canDoAutoSkip: function() {
-        // (1) view.incl_nbhd was false (or undefined).
-        if (this.helperRequestParams.incl_nbhd_in_view) return false;
+        // (1) view.inclNbhd was false (or undefined).
+        if (this.helperRequestParams.incl_nbhd_in_view) {
+            return false;
+        }
+
         // (2) reload is empty or undefined.
-        if (this.helperRequestParams.reload) return false;
-        // (3) view/view.objects is 'all' or everything it names is already present
+        if (this.helperRequestParams.reload) {
+            return false;
+        }
+
+        // (3) view is 'all' or everything it names is already present
         // (4) everything in on_board is already present.
-        var to_view = this.viewParams.named;
-        var on_board = moose.normalizeBoxlist(this.helperRequestParams.on_board);
+        const to_view = this.viewParams.named;
+        const on_board = moose.normalizeBoxlist(this.helperRequestParams.on_board);
         // After `setUpParameters()` has been called, we can trust that `this.viewParams.named`
         // either is keyword 'all', or is null, or else is the array (possibly empty) of libpaths
         // to be viewed. Likewise, `on_board` is either null, or a (possibly empty) array of libpaths.
-        var to_scan = [];
-        if (to_view !== 'all' && to_view !== null) to_scan = to_view.slice();
-        if (on_board !== null) to_scan = to_scan.concat(on_board);
-        for (var i in to_scan) {
-            var lp = to_scan[i];
+        let to_scan = [];
+        if (to_view !== 'all' && to_view !== null) {
+            to_scan = to_view.slice();
+        }
+        if (on_board !== null) {
+            to_scan = to_scan.concat(on_board);
+        }
+        for (const lp of to_scan) {
             // Forest records both nodes and deducs as "nodes", so this one check suffices:
-            if (!this.forest.nodeIsPresent(lp)) return false;
+            if (!this.forest.nodeIsPresent(lp)) {
+                return false;
+            }
         }
         // Passed all tests.
         return true;
@@ -695,13 +706,13 @@ TransitionManager.prototype = {
          *
          * If defined, it should be one of the following:
          *    true: this means do not change the current selection;
-         *    null: this means clear the selection;
+         *    false: this means clear the selection;
          *    a libpath: this node should be selected;
          *    an Array of libpaths: these nodes should be selected.
          *
-         * If undefined, we will turn to this.viewParams.named.
+         * If undefined, we will turn first to `ordSel`, and then to `this.viewParams.named`.
          */
-        var selection = true;
+        let selection = true;
         if (params.select !== undefined) {
             selection = params.select;
         } else if (params.ordSel !== undefined && params.ordSel >= 0) {
@@ -710,7 +721,7 @@ TransitionManager.prototype = {
                 selection = [u];
             }
         } else {
-            var named = this.viewParams.named;
+            const named = this.viewParams.named;
             // Accept if it names a single libpath or an array thereof.
             if (typeof(named) === "string" && named !== 'all') {
                 selection = named;

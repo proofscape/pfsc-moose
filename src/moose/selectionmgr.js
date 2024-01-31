@@ -129,21 +129,24 @@ SelectionManager.prototype = {
     /* Way of requesting an update to the selection, using a coded request:
      *
      * If req is `true`, do nothing.
-     * If req is `null`, just clear the selection.
+     * If req is `false`, just clear the selection.
      * If req is a libpath, select just that node, if present; if not present, fail silently.
      * If req is an array of libpaths, select all those nodes (if present).
      */
     requestSelectionState: function(req) {
-        if (req === true) return;
-        else if (req === null) this.clear();
-        else if (typeof(req) === "string") {
-            this.setSingleton(req);
+        if (req === true) {
+            return;
         }
-        else if (Array.isArray(req)) {
-            var lps = {},
-                size = 0;
-            req.forEach(function(lp){ lps[lp] = 1; size++; });
-            this.setSelection(lps, size);
+        if (req === false) {
+            this.clear();
+        } else if (typeof(req) === "string") {
+            this.setSingleton(req);
+        } else if (Array.isArray(req)) {
+            const lps = {};
+            for (const lp of req) {
+                lps[lp] = 1;
+            }
+            this.setSelection(lps);
         }
     },
 
