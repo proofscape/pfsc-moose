@@ -35,7 +35,8 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  * may be undefined. Their meaning is described below.
  *
  *  {
- *      view: (see below),
+ *      view: 'all' or boxlisting,
+ *      viewOpts: object
  *      coords: 'fixed' or [x, y, zf],
  *      onBoard: boxlisting,
  *      offBoard: 'all' or boxlisting,
@@ -50,9 +51,8 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *      flow: boolean
  *  }
  *
- * view: Name boxes (nodes and deducs) that should be "viewed," and optionally control
- *      how the viewbox is updated. Also affects the node selection unless `select` param
- *      is also defined (see below).
+ * view: Name boxes (nodes and deducs) that should be "viewed." Also affects the node selection
+ *      unless `select` param is also defined (see below).
  *
  *      The system will automatically ensure first that any boxes to be viewed are actually
  *      present, opening deducs as necessary to achieve this, and then will update the
@@ -62,31 +62,17 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *      You may pass a boxlisting, or keyword 'all' indicating that you want to view
  *      everything currently on the board (an "overview").
  *
- *      Alternatively, you may pass an object looking roughly as follows:
- *
- *      {
- *          objects: 'all' or boxlisting,
- *          incl_nbhd: true if you want to automatically add the full deductive nbhd of each named node
- *          zoom_range: [0.5, 2.0],
- *          core: nodes that we must see; others may be off-screen if need be to save the zoom_range
- *          pan_policy: choose from among the moose.autopanPolicy_ values
- *          center: 'all' or 'core' or boxlisting (i.e. what to center on, if centering)
- *          viewbox_padding_px: 20
- *          viewbox_padding_percent: 5
- *          inset_aware: true/false
- *      }
- *
- *      In this case, the `objects` field takes over the role of indicating the boxes
- *      that are to be viewed, as before.
- *
- *      NB: `view` affects selection! If you pass a boxlisting, or pass a full set of parameters
- *      with a boxlisting in the `objects` field, then the first box named in this listing will
- *      become the selected box _unless_ the `select` parameter (see below) is defined.
- *
- *      As for the remaning parameters, please see the doctext for `Floor.computeViewCoords()`
- *      for their exact meaning.
+ *      NB: `view` affects selection! If you pass a boxlisting, then these boxes will be
+ *      selected, unless the `select` parameter (see below) is defined and says otherwise.
  *
  *      Default: undefined
+ *
+ * viewOpts: Pass an object defining various options to control how the view updates.
+ *      There is one special option:
+ *          inclNbhd: boolean, set true to enlarge the view by including all nodes
+ *              one deduction edge away from those named.
+ *      Beyond this, you may pass any of the options accepted by `Floor.computeViewCoords()`.
+ *      See docstring for that method.
  *
  * coords: Specify the view coordinates directly.
  *
@@ -203,9 +189,9 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *
  *      Ordinarily the system will automatically skip the backend call if all of the
  *      following conditions are met:
- *          * view/view.objects is 'all' or everything it names is already present;
- *          * view.incl_nbhd is false (or undefined);
- *          * everything in on_board is already present; AND
+ *          * view is 'all' or everything it names is already present;
+ *          * view.inclNbhd is false (or undefined);
+ *          * everything in onBoard is already present; AND
  *          * reload is empty or undefined.
  *
  *      But there may be other cases in which you know that the backend call is
@@ -348,44 +334,15 @@ TransitionManager.prototype = {
             off_board = params.offBoard || null,
             reload = params.reload || null,
             versions = params.versions || {},
-            to_view = null,
-            incl_nbhd_in_view = false;
+            to_view = params.view || null,
+            incl_nbhd_in_view = params.viewOpts?.inclNbhd || false;
 
-        // View parameters:
-        // Under `view`, the user may pass a mere boxlisting of deducs and nodes to be viewed, or may
-        // pass a whole object, in which such a listing occurs under the `objects` field, alongside
-        // several other optional fields, which are detailed in the doctext for Floor.computeViewCoords().
-        //
-        // Thus, the boxlisting of deducs and nodes to be viewed -- i.e. the value to be passed to the
-        // back-end as the `to_view` parameter -- may be under `params.view` or `params.view.object`, or
-        // it may not be defined at all.
-        //
-        // Our job now is to normalize all this. We begin by determining the value of `to_view` for the back-end.
-        // Then, we ensure that under `this.viewParams` we are storing all the parameters for Floor.computeViewCoords().
-        //
-        if (params.view !== undefined) {
-            // User may pass just the value of the `objects` parameter, or may define a whole object
-            // containing that and other parameters.
-            if (typeof(params.view) === "string" || Array.isArray(params.view)) {
-                // params.view appears to be a boxlisting
-                to_view = params.view;
-                incl_nbhd_in_view = false;
-                this.viewParams = {};
-            } else {
-                // params.view appears to be a full object
-                to_view = params.view.objects;
-                if (params.view.incl_nbhd !== undefined) {
-                    incl_nbhd_in_view = params.view.incl_nbhd;
-                }
-                this.viewParams = params.view;
-            }
-        } else {
-            this.viewParams = {};
-        }
+        this.viewParams = params.viewOpts !== undefined ? params.viewOpts : {};
+
         // The set of deducs that were named for viewing in the given params will be saved
         // under the `named` field in our `viewParams`. Later, after the back-end has computed
-        // the full "view closure", that value will replace this.viewParams.objects.
-        // Thus, `named` is a record of what was called for _before_ the closure was computed.
+        // the full "view closure", that value will be recorded in `this.viewParams.objects`.
+        // Thus, `named` is a record of what was called for *before* the closure was computed.
         this.viewParams.named = moose.normalizeBoxlist(to_view);
 
         // Make a lookup of known dashgraphs (whether or not supplied in the params).
