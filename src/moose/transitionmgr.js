@@ -524,7 +524,7 @@ TransitionManager.prototype = {
         return skipData;
     },
 
-    /* Helper funciton to manage computation of the desired view coords in a state request.
+    /* Helper function to manage computation of the desired view coords in a state request.
      *
      * NB: This cannot be done until open/close operations have finished changing the set of
      * nodes on the board.
@@ -536,7 +536,7 @@ TransitionManager.prototype = {
             // If user didn't define coords or view, then we won't update the view.
             desiredViewCoords = null;
         } else if (params.coords === 'fixed') {
-            // The user can also explicity indicate that the view is not to be updated, by defining coords = 'fixed'.
+            // The user can also explicitly indicate that the view is not to be updated, by defining coords = 'fixed'.
             desiredViewCoords = null;
         } else if (params.coords !== undefined) {
             // If we gave coordinates directly, then just use those.
