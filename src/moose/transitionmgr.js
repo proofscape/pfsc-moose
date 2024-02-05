@@ -35,12 +35,12 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  * may be undefined. Their meaning is described below.
  *
  *  {
- *      view: 'all' or boxlisting,
- *      viewOpts: object
+ *      view: '<all>' or boxlisting,
+ *      viewOpts: object (see below)
  *      coords: 'fixed' or [x, y, zf],
  *      onBoard: boxlisting,
- *      offBoard: 'all' or boxlisting,
- *      reload: 'all' or boxlisting,
+ *      offBoard: '<all>' or boxlisting,
+ *      reload: '<all>' or boxlisting,
  *      versions: (see below),
  *      select: boolean or boxlisting,
  *      color: (see below),
@@ -59,7 +59,7 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *      viewbox to show these boxes. The `view` parameter therefore often makes
  *      the `onBoard` parameter unnecessary (see below).
  *
- *      You may pass a boxlisting, or keyword 'all' indicating that you want to view
+ *      You may pass a boxlisting, or keyword '<all>' indicating that you want to view
  *      everything currently on the board (an "overview").
  *
  *      NB: `view` affects selection! If you pass a boxlisting, then these boxes will be
@@ -69,7 +69,7 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *
  * viewOpts: Pass an object defining various options to control how the view updates.
  *      There is one special option:
- *          inclNbhd: boolean, set true to enlarge the view by including all nodes
+ *          inclNbhd: boolean, default false. Set true to enlarge the view by including all nodes
  *              one deduction edge away from those named.
  *      Beyond this, you may pass any of the options accepted by `Floor.computeViewCoords()`.
  *      See docstring for that method.
@@ -93,7 +93,7 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *
  * offBoard: Name boxes that should not be on board.
  *
- *      Pass any boxlisting, or keyword 'all' indicating that you want everything presently on
+ *      Pass any boxlisting, or keyword '<all>' indicating that you want everything presently on
  *      board to be removed.
  *
  *      If offBoard contradicts onBoard or view, it is overruled by them. In other words, putting
@@ -103,7 +103,7 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *
  * reload: Name boxes that should be reloaded.
  *
- *      Pass any boxlisting, or keyword 'all' indicating that everything presently on board should be
+ *      Pass any boxlisting, or keyword '<all>' indicating that everything presently on board should be
  *      reloaded. This is useful in case a deduc has been rebuilt, and you want to load the latest
  *      version from disk.
  *
@@ -164,7 +164,7 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *          - moose.layoutMethod_OrderedList
  *
  *      If the set of deducs on board is changing (i.e. anything is being opened or closed), then
- *      this is the layout method that will be used during the concommitant relayout.
+ *      this is the layout method that will be used during the concomitant re-layout.
  *      If not, then a new layout is computed simply to put the desired method into effect.
  *
  *      Default: defaults to the default layout method of the associated Forest, if any;
@@ -189,7 +189,7 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *
  *      Ordinarily the system will automatically skip the backend call if all of the
  *      following conditions are met:
- *          * view is 'all' or everything it names is already present;
+ *          * view is '<all>' or everything it names is already present;
  *          * view.inclNbhd is false (or undefined);
  *          * everything in onBoard is already present; AND
  *          * reload is empty or undefined.
@@ -389,15 +389,15 @@ TransitionManager.prototype = {
             return false;
         }
 
-        // (3) view is 'all' or everything it names is already present
+        // (3) view is '<all>' or everything it names is already present
         // (4) everything in on_board is already present.
         const to_view = this.viewParams.named;
         const on_board = moose.normalizeBoxlist(this.helperRequestParams.on_board);
         // After `setUpParameters()` has been called, we can trust that `this.viewParams.named`
-        // either is keyword 'all', or is null, or else is the array (possibly empty) of libpaths
+        // either is keyword '<all>', or is null, or else is the array (possibly empty) of libpaths
         // to be viewed. Likewise, `on_board` is either null, or a (possibly empty) array of libpaths.
         let to_scan = [];
-        if (to_view !== 'all' && to_view !== null) {
+        if (to_view !== '<all>' && to_view !== null) {
             to_scan = to_view.slice();
         }
         if (on_board !== null) {
@@ -436,7 +436,7 @@ TransitionManager.prototype = {
 
         if (this.givenParams.local || this.canDoAutoSkip()) {
             // We first want normalized versions of several data points.
-            // These normalized versions will be either keyword strings ('all')
+            // These normalized versions will be either keyword strings ('<all>')
             // or arrays (possibly empty).
             var norm_off = moose.normalizeBoxlist(this.helperRequestParams.off_board) || [],
                 norm_reload = moose.normalizeBoxlist(this.helperRequestParams.reload) || [],
@@ -447,7 +447,7 @@ TransitionManager.prototype = {
 
             // Compute the array of deducs to close.
             var toClose = [];
-            if (norm_off === 'all' || norm_reload === 'all') {
+            if (norm_off === '<all>' || norm_reload === '<all>') {
                 toClose = forest.listAllDeducUIDs();
             } else {
                 let seen = {};
@@ -467,10 +467,10 @@ TransitionManager.prototype = {
             // Compute the array of deducs to open.
             // Note that when it's an auto skip, this array will wind up empty, as it should.
             // Anything to be reloaded is to be opened even if already present.
-            var toOpen = norm_reload === 'all' ? forest.listAllDeducUIDs() : norm_reload.slice();
+            var toOpen = norm_reload === '<all>' ? forest.listAllDeducUIDs() : norm_reload.slice();
             // For on_board, and view, we only want to open a deduc if it is _not_ yet present.
             var toScan = norm_on.slice();
-            if (norm_view !== 'all') {
+            if (norm_view !== '<all>') {
                 toScan = toScan.concat(norm_view);
             }
             let seen = {};
@@ -531,7 +531,7 @@ TransitionManager.prototype = {
      *        not already on board after the close operation.
      *    dashgraphs: a lookup, in which the libpaths in the to_open list point
      *        to the latest dashgraphs for these deducs, loaded freshly from disk.
-     *    view_closure: either keyword `all` or a boxlisting of boxes to be viewed.
+     *    view_closure: either keyword `<all>` or a boxlisting of boxes to be viewed.
      *        If we requested nbhd closure then that has been performed.
      *  }
      */
@@ -723,7 +723,7 @@ TransitionManager.prototype = {
         } else {
             const named = this.viewParams.named;
             // Accept if it names a single libpath or an array thereof.
-            if (typeof(named) === "string" && named !== 'all') {
+            if (typeof(named) === "string" && named !== '<all>') {
                 selection = named;
             } else if (Array.isArray(named)) {
                 selection = named;

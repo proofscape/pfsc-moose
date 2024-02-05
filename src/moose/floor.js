@@ -965,7 +965,7 @@ Floor.prototype = {
      *
      * Parameters:
      *
-     * objects: 'all' means you want to view everything on the board.
+     * objects: '<all>' means you want to view everything on the board.
      *      Otherwise this should be an array of libpaths of nodes and deducs that you want to view.
      *
      *      Default: undefined
@@ -980,21 +980,21 @@ Floor.prototype = {
      *      we will attempt instead only to fit the `core` objects into the padded viewbox, i.e. only those
      *      objects listed under this parameter.
      *
-     *      Accepts either an array of libpaths, or else keyword `named`. The latter means that the core
+     *      Accepts either an array of libpaths, or else keyword `<named>`. The latter means that the core
      *      objects are those listed in the `named` parameter.
      *
-     *      Default: 'named'
+     *      Default: '<named>'
      *
      * center: Indicates on which objects the view should be centered _if centering_. (See `panPolicy` below.)
      *      May be either an array of libpaths, or else one of the keywords:
-     *          'all': center on all the nodes named in `objects`
-     *          'core': center on all the nodes named in `core`
-     *          'named': center on all the nodes named in `named`
+     *          '<all>': center on all the nodes named in `objects`
+     *          '<core>': center on all the nodes named in `core`
+     *          '<named>': center on all the nodes named in `named`
      *
-     *      Note: If `center` is different from 'all' then the final result may be such that a larger zoom scale
+     *      Note: If `center` is different from '<all>' then the final result may be such that a larger zoom scale
      *      would have permitted the centered nodes all to fit in the padded viewbox.
      *
-     *      Default: 'all'
+     *      Default: '<all>'
      *
      * viewboxPaddingPx: Set a constant padding for the viewbox, in pixels.
      *
@@ -1038,8 +1038,8 @@ Floor.prototype = {
     computeViewCoords : function(userParams) {
         // Start with default parameter values.
         var par = {
-            core: 'named',
-            center: 'all',
+            core: '<named>',
+            center: '<all>',
             viewboxPaddingPercent: 5,
             maxZoom: this.forest.isInUnifiedMode() ? 1.4 : null,
             minZoom: null,
@@ -1062,7 +1062,7 @@ Floor.prototype = {
             coreLookup = null,
             centerLookup = null;
 
-        if (par.objects === 'all') {
+        if (par.objects === '<all>') {
             objLookup = this.forest.getAllVisibleNodes({patient: true});
             namedLookup = objLookup;
         } else {
@@ -1070,17 +1070,17 @@ Floor.prototype = {
             namedLookup = this.forest.getNodes(par.named);
         }
 
-        if (par.core === 'named') {
+        if (par.core === '<named>') {
             coreLookup = namedLookup;
         } else if (par.core !== undefined) {
             coreLookup = this.forest.getNodes(par.core);
         }
 
-        if (par.center === 'all') {
+        if (par.center === '<all>') {
             centerLookup = objLookup;
-        } else if (par.center === 'core') {
+        } else if (par.center === '<core>') {
             centerLookup = coreLookup;
-        } else if (par.center === 'named') {
+        } else if (par.center === '<named>') {
             centerLookup = namedLookup;
         } else if (par.center !== undefined) {
             centerLookup = this.forest.getNodes(par.center);
