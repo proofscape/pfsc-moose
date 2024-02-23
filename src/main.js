@@ -45,7 +45,7 @@ function open(forest, lps, opts) {
             local: true,
             known_dashgraphs: kd,
             onBoard: lps,
-            view: 'all'
+            view: '<all>'
         };
         Object.assign(opts0, opts);
         forest.requestState(opts0);

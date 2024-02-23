@@ -423,8 +423,8 @@ Forest.prototype = {
         if (mode !== this.expansionMode) {
             this.expansionMode = mode;
             return this.requestState({
-                reload: 'all',
-                view: 'all',
+                reload: '<all>',
+                view: '<all>',
             });
         } else {
             return Promise.resolve();
