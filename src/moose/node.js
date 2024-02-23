@@ -975,9 +975,7 @@ Node.prototype = {
         const realvers = this.realVersion();
         if (realpath && this.forest) {
             this.forest.requestState({
-                view: {
-                    objects: realpath
-                },
+                view: [realpath],
                 versions: {
                     [realpath]: realvers,
                 },

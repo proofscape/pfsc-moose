@@ -339,6 +339,13 @@ TransitionManager.prototype = {
 
         this.viewParams = params.viewOpts !== undefined ? params.viewOpts : {};
 
+        // Try to catch any lingering mis-usages from when the `view` parameter could take
+        // a complex form, combining `view` with what now goes under `viewOpts`.
+        console.assert(
+            to_view === null || typeof(to_view) === "string" || Array.isArray(to_view),
+            "`to_view` should be null or string or array of libpaths."
+        );
+
         // The set of deducs that were named for viewing in the given params will be saved
         // under the `named` field in our `viewParams`. Later, after the back-end has computed
         // the full "view closure", that value will be recorded in `this.viewParams.objects`.
