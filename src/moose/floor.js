@@ -975,7 +975,7 @@ Floor.prototype = {
      *
      *      Default: undefined
      *
-     * core: If a lower zoom bound has been set (see `zoom_range` below), and if a zoom level less than this
+     * core: If a lower zoom bound has been set (see `minZoom` below), and if a zoom level less than this
      *      lower bound would be necessary in order to fit all desired `objects` into the padded viewbox, then
      *      we will attempt instead only to fit the `core` objects into the padded viewbox, i.e. only those
      *      objects listed under this parameter.
@@ -985,7 +985,7 @@ Floor.prototype = {
      *
      *      Default: '<named>'
      *
-     * center: Indicates on which objects the view should be centered _if centering_. (See `panPolicy` below.)
+     * center: Indicates on which objects the view should be centered *if centering*. (See `panPolicy` below.)
      *      May be either an array of libpaths, or else one of the keywords:
      *          '<all>': center on all the nodes named in `objects`
      *          '<core>': center on all the nodes named in `core`
