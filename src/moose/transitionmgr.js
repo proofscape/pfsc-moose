@@ -35,13 +35,14 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  * may be undefined. Their meaning is described below.
  *
  *  {
- *      view: (see below),
+ *      view: '<all>' or boxlisting,
+ *      viewOpts: object (see below)
  *      coords: 'fixed' or [x, y, zf],
- *      on_board: boxlisting,
- *      off_board: 'all' or boxlisting,
- *      reload: 'all' or boxlisting,
+ *      onBoard: boxlisting,
+ *      offBoard: '<all>' or boxlisting,
+ *      reload: '<all>' or boxlisting,
  *      versions: (see below),
- *      select: null or true or boxlisting,
+ *      select: boolean or boxlisting,
  *      color: (see below),
  *      layout: a layout method,
  *      transition: true/false,
@@ -50,43 +51,28 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *      flow: boolean
  *  }
  *
- * view: Name boxes (nodes and deducs) that should be "viewed," and optionally control
- *      how the viewbox is updated. Also affects the node selection unless `select` param
- *      is also defined (see below).
+ * view: Name boxes (nodes and deducs) that should be "viewed." Also affects the node selection
+ *      unless `select` param is also defined (see below).
  *
  *      The system will automatically ensure first that any boxes to be viewed are actually
  *      present, opening deducs as necessary to achieve this, and then will update the
  *      viewbox to show these boxes. The `view` parameter therefore often makes
- *      the `on_board` parameter unnecessary (see below).
+ *      the `onBoard` parameter unnecessary (see below).
  *
- *      You may pass a boxlisting, or keyword 'all' indicating that you want to view
+ *      You may pass a boxlisting, or keyword '<all>' indicating that you want to view
  *      everything currently on the board (an "overview").
  *
- *      Alternatively, you may pass an object looking roughly as follows:
- *
- *      {
- *          objects: 'all' or boxlisting,
- *          incl_nbhd: true if you want to automatically add the full deductive nbhd of each named node
- *          zoom_range: [0.5, 2.0],
- *          core: nodes that we must see; others may be off-screen if need be to save the zoom_range
- *          pan_policy: choose from among the moose.autopanPolicy_ values
- *          center: 'all' or 'core' or boxlisting (i.e. what to center on, if centering)
- *          viewbox_padding_px: 20
- *          viewbox_padding_percent: 5
- *          inset_aware: true/false
- *      }
- *
- *      In this case, the `objects` field takes over the role of indicating the boxes
- *      that are to be viewed, as before.
- *
- *      NB: `view` affects selection! If you pass a boxlisting, or pass a full set of parameters
- *      with a boxlisting in the `objects` field, then the first box named in this listing will
- *      become the selected box _unless_ the `select` parameter (see below) is defined.
- *
- *      As for the remaning parameters, please see the doctext for `Floor.computeViewCoords()`
- *      for their exact meaning.
+ *      NB: `view` affects selection! If you pass a boxlisting, then these boxes will be
+ *      selected, unless the `select` parameter (see below) is defined and says otherwise.
  *
  *      Default: undefined
+ *
+ * viewOpts: Pass an object defining various options to control how the view updates.
+ *      There is one special option:
+ *          inclNbhd: boolean, default false. Set true to enlarge the view by including all nodes
+ *              one deduction edge away from those named.
+ *      Beyond this, you may pass any of the options accepted by `Floor.computeViewCoords()`.
+ *      See docstring for that method.
  *
  * coords: Specify the view coordinates directly.
  *
@@ -98,26 +84,26 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *
  *      Default: undefined
  *
- * on_board: Name boxes that should be on board.
+ * onBoard: Name boxes that should be on board.
  *
  *      Pass any boxlisting. The system will ensure that every deduc in the deduc closure thereof
  *      is on board, opening it if necessary, or leaving it if it is already there.
  *
  *      Default: undefined
  *
- * off_board: Name boxes that should not be on board.
+ * offBoard: Name boxes that should not be on board.
  *
- *      Pass any boxlisting, or keyword 'all' indicating that you want everything presently on
+ *      Pass any boxlisting, or keyword '<all>' indicating that you want everything presently on
  *      board to be removed.
  *
- *      If off_board contradicts on_board or view, it is overruled by them. In other words, putting
+ *      If offBoard contradicts onBoard or view, it is overruled by them. In other words, putting
  *      things on the board is favored over removing them.
  *
  *      Default: undefined
  *
  * reload: Name boxes that should be reloaded.
  *
- *      Pass any boxlisting, or keyword 'all' indicating that everything presently on board should be
+ *      Pass any boxlisting, or keyword '<all>' indicating that everything presently on board should be
  *      reloaded. This is useful in case a deduc has been rebuilt, and you want to load the latest
  *      version from disk.
  *
@@ -129,7 +115,7 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *      Let us say that in this case the system "rescues" deduc E. Then the order of overriding is as
  *      follows:
  *
- *              on_board, view, reload  >  off_board  >  rescue
+ *              onBoard, view, reload  >  offBoard  >  rescue
  *
  *      In other words, if the user explicitly asks that something be present, this overrides a request
  *      that it be absent. However, an explicit request that something be absent overrides a rescue.
@@ -141,11 +127,11 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *      Pass an object mapping libpaths to full version strings (i.e. either "WIP" for work-in-progress,
  *      or a numbered version of the form `vM.m.p`).
  *
- *      The mapping may speak for any libpath listed in any of the three arguments `view`, `on_board`,
+ *      The mapping may speak for any libpath listed in any of the three arguments `view`, `onBoard`,
  *      and `reload`. It is allowed to be implicit, meaning that not every libpath has to be a key,
  *      but some proper segment-wise prefix of it must be.
  *
- *      For any libpath in `view`, `on_board`, or `reload` that is not given a version by this argument,
+ *      For any libpath in `view`, `onBoard`, or `reload` that is not given a version by this argument,
  *      we will fall back on versions implied by anything already on board. If that is silent as well,
  *      it is an error.
  *
@@ -153,7 +139,7 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *
  *      Legal values are:
  *          - true: keep the selection as it is ("stay true")
- *          - null: clear the selection (i.e. no nodes should be selected)
+ *          - false: clear the selection (i.e. no nodes should be selected)
  *          - a boxlisting: select all the boxes in the listing
  *
  *      Default: true; however, if the `view` parameter is defined, that can override this. See above.
@@ -178,7 +164,7 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *          - moose.layoutMethod_OrderedList
  *
  *      If the set of deducs on board is changing (i.e. anything is being opened or closed), then
- *      this is the layout method that will be used during the concommitant relayout.
+ *      this is the layout method that will be used during the concomitant re-layout.
  *      If not, then a new layout is computed simply to put the desired method into effect.
  *
  *      Default: defaults to the default layout method of the associated Forest, if any;
@@ -203,9 +189,9 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *
  *      Ordinarily the system will automatically skip the backend call if all of the
  *      following conditions are met:
- *          * view/view.objects is 'all' or everything it names is already present;
- *          * view.incl_nbhd is false (or undefined);
- *          * everything in on_board is already present; AND
+ *          * view is '<all>' or everything it names is already present;
+ *          * view.inclNbhd is false (or undefined);
+ *          * everything in onBoard is already present; AND
  *          * reload is empty or undefined.
  *
  *      But there may be other cases in which you know that the backend call is
@@ -218,17 +204,17 @@ import { SubgraphBuilder } from "./subgraphbuilder.js";
  *      deducs, but you must understand that the responsibility to make a request that will
  *      work rests on you. In particular:
  *
- *          * You may name both nodes and deducs in `off_board`.
+ *          * You may name both nodes and deducs in `offBoard`.
  *          * You must not name any nodes (only deducs) in `reload`.
- *          * Anything named in `on_board` or `view/view.objects` that is not
+ *          * Anything named in `onBoard` or `view` that is not
  *            already present in the forest must be a deduc, not a node (since we will
  *            attempt to open it).
  *          * Any deducs that will be opened will be processed in the order
- *            given, first in `reload`, then in `on_board`, and finally in
- *            `view/view.objects`. It is up to you to ensure that this ordering
+ *            given, first in `reload`, then in `onBoard`, and finally in
+ *            `view`. It is up to you to ensure that this ordering
  *            is topological (i.e. targets come before expansions).
  *
- * flow: If true, show flow edges in deducs being opened; if false, suppress them; if
+ * flow: Boolean. If true, show flow edges in deducs being opened; if false, suppress them; if
  *      undefined, default to current setting in the Forest.
  */
 var TransitionManager = function(forest, params) {
@@ -343,49 +329,27 @@ TransitionManager.prototype = {
         }
 
         // Set up data for request to back-end.
-        var current_forest = this.forest.getFloor().writeVersionedForestRepn(),
-            on_board = params.on_board || null,
-            off_board = params.off_board || null,
+        const current_forest = this.forest.getFloor().writeVersionedForestRepn(),
+            on_board = params.onBoard || null,
+            off_board = params.offBoard || null,
             reload = params.reload || null,
             versions = params.versions || {},
-            to_view = null,
-            incl_nbhd_in_view = false;
+            to_view = params.view || null,
+            incl_nbhd_in_view = params.viewOpts?.inclNbhd || false;
 
-        // View parameters:
-        // Under `view`, the user may pass a mere boxlisting of deducs and nodes to be viewed, or may
-        // pass a whole object, in which such a listing occurs under the `objects` field, alongside
-        // several other optional fields, which are detailed in the doctext for Floor.computeViewCoords().
-        //
-        // Thus, the boxlisting of deducs and nodes to be viewed -- i.e. the value to be passed to the
-        // back-end as the `to_view` parameter -- may be under `params.view` or `params.view.object`, or
-        // it may not be defined at all.
-        //
-        // Our job now is to normalize all this. We begin by determining the value of `to_view` for the back-end.
-        // Then, we ensure that under `this.viewParams` we are storing all the parameters for Floor.computeViewCoords().
-        //
-        if (params.view !== undefined) {
-            // User may pass just the value of the `objects` parameter, or may define a whole object
-            // containing that and other parameters.
-            if (typeof(params.view) === "string" || Array.isArray(params.view)) {
-                // params.view appears to be a boxlisting
-                to_view = params.view;
-                incl_nbhd_in_view = false;
-                this.viewParams = {};
-            } else {
-                // params.view appears to be a full object
-                to_view = params.view.objects;
-                if (params.view.incl_nbhd !== undefined) {
-                    incl_nbhd_in_view = params.view.incl_nbhd;
-                }
-                this.viewParams = params.view;
-            }
-        } else {
-            this.viewParams = {};
-        }
+        this.viewParams = params.viewOpts !== undefined ? params.viewOpts : {};
+
+        // Try to catch any lingering mis-usages from when the `view` parameter could take
+        // a complex form, combining `view` with what now goes under `viewOpts`.
+        console.assert(
+            to_view === null || typeof(to_view) === "string" || Array.isArray(to_view),
+            "`to_view` should be null or string or array of libpaths."
+        );
+
         // The set of deducs that were named for viewing in the given params will be saved
         // under the `named` field in our `viewParams`. Later, after the back-end has computed
-        // the full "view closure", that value will replace this.viewParams.objects.
-        // Thus, `named` is a record of what was called for _before_ the closure was computed.
+        // the full "view closure", that value will be recorded in `this.viewParams.objects`.
+        // Thus, `named` is a record of what was called for *before* the closure was computed.
         this.viewParams.named = moose.normalizeBoxlist(to_view);
 
         // Make a lookup of known dashgraphs (whether or not supplied in the params).
@@ -422,24 +386,35 @@ TransitionManager.prototype = {
      * Note: Must not call this method until after `setUpParameters()` has already been called.
      */
     canDoAutoSkip: function() {
-        // (1) view.incl_nbhd was false (or undefined).
-        if (this.helperRequestParams.incl_nbhd_in_view) return false;
+        // (1) view.inclNbhd was false (or undefined).
+        if (this.helperRequestParams.incl_nbhd_in_view) {
+            return false;
+        }
+
         // (2) reload is empty or undefined.
-        if (this.helperRequestParams.reload) return false;
-        // (3) view/view.objects is 'all' or everything it names is already present
+        if (this.helperRequestParams.reload) {
+            return false;
+        }
+
+        // (3) view is '<all>' or everything it names is already present
         // (4) everything in on_board is already present.
-        var to_view = this.viewParams.named;
-        var on_board = moose.normalizeBoxlist(this.helperRequestParams.on_board);
+        const to_view = this.viewParams.named;
+        const on_board = moose.normalizeBoxlist(this.helperRequestParams.on_board);
         // After `setUpParameters()` has been called, we can trust that `this.viewParams.named`
-        // either is keyword 'all', or is null, or else is the array (possibly empty) of libpaths
+        // either is keyword '<all>', or is null, or else is the array (possibly empty) of libpaths
         // to be viewed. Likewise, `on_board` is either null, or a (possibly empty) array of libpaths.
-        var to_scan = [];
-        if (to_view !== 'all' && to_view !== null) to_scan = to_view.slice();
-        if (on_board !== null) to_scan = to_scan.concat(on_board);
-        for (var i in to_scan) {
-            var lp = to_scan[i];
+        let to_scan = [];
+        if (to_view !== '<all>' && to_view !== null) {
+            to_scan = to_view.slice();
+        }
+        if (on_board !== null) {
+            to_scan = to_scan.concat(on_board);
+        }
+        for (const lp of to_scan) {
             // Forest records both nodes and deducs as "nodes", so this one check suffices:
-            if (!this.forest.nodeIsPresent(lp)) return false;
+            if (!this.forest.nodeIsPresent(lp)) {
+                return false;
+            }
         }
         // Passed all tests.
         return true;
@@ -468,7 +443,7 @@ TransitionManager.prototype = {
 
         if (this.givenParams.local || this.canDoAutoSkip()) {
             // We first want normalized versions of several data points.
-            // These normalized versions will be either keyword strings ('all')
+            // These normalized versions will be either keyword strings ('<all>')
             // or arrays (possibly empty).
             var norm_off = moose.normalizeBoxlist(this.helperRequestParams.off_board) || [],
                 norm_reload = moose.normalizeBoxlist(this.helperRequestParams.reload) || [],
@@ -479,7 +454,7 @@ TransitionManager.prototype = {
 
             // Compute the array of deducs to close.
             var toClose = [];
-            if (norm_off === 'all' || norm_reload === 'all') {
+            if (norm_off === '<all>' || norm_reload === '<all>') {
                 toClose = forest.listAllDeducUIDs();
             } else {
                 let seen = {};
@@ -499,10 +474,10 @@ TransitionManager.prototype = {
             // Compute the array of deducs to open.
             // Note that when it's an auto skip, this array will wind up empty, as it should.
             // Anything to be reloaded is to be opened even if already present.
-            var toOpen = norm_reload === 'all' ? forest.listAllDeducUIDs() : norm_reload.slice();
+            var toOpen = norm_reload === '<all>' ? forest.listAllDeducUIDs() : norm_reload.slice();
             // For on_board, and view, we only want to open a deduc if it is _not_ yet present.
             var toScan = norm_on.slice();
-            if (norm_view !== 'all') {
+            if (norm_view !== '<all>') {
                 toScan = toScan.concat(norm_view);
             }
             let seen = {};
@@ -524,7 +499,7 @@ TransitionManager.prototype = {
         return skipData;
     },
 
-    /* Helper funciton to manage computation of the desired view coords in a state request.
+    /* Helper function to manage computation of the desired view coords in a state request.
      *
      * NB: This cannot be done until open/close operations have finished changing the set of
      * nodes on the board.
@@ -536,7 +511,7 @@ TransitionManager.prototype = {
             // If user didn't define coords or view, then we won't update the view.
             desiredViewCoords = null;
         } else if (params.coords === 'fixed') {
-            // The user can also explicity indicate that the view is not to be updated, by defining coords = 'fixed'.
+            // The user can also explicitly indicate that the view is not to be updated, by defining coords = 'fixed'.
             desiredViewCoords = null;
         } else if (params.coords !== undefined) {
             // If we gave coordinates directly, then just use those.
@@ -563,7 +538,7 @@ TransitionManager.prototype = {
      *        not already on board after the close operation.
      *    dashgraphs: a lookup, in which the libpaths in the to_open list point
      *        to the latest dashgraphs for these deducs, loaded freshly from disk.
-     *    view_closure: either keyword `all` or a boxlisting of boxes to be viewed.
+     *    view_closure: either keyword `<all>` or a boxlisting of boxes to be viewed.
      *        If we requested nbhd closure then that has been performed.
      *  }
      */
@@ -738,13 +713,13 @@ TransitionManager.prototype = {
          *
          * If defined, it should be one of the following:
          *    true: this means do not change the current selection;
-         *    null: this means clear the selection;
+         *    false: this means clear the selection;
          *    a libpath: this node should be selected;
          *    an Array of libpaths: these nodes should be selected.
          *
-         * If undefined, we will turn to this.viewParams.named.
+         * If undefined, we will turn first to `ordSel`, and then to `this.viewParams.named`.
          */
-        var selection = true;
+        let selection = true;
         if (params.select !== undefined) {
             selection = params.select;
         } else if (params.ordSel !== undefined && params.ordSel >= 0) {
@@ -753,9 +728,9 @@ TransitionManager.prototype = {
                 selection = [u];
             }
         } else {
-            var named = this.viewParams.named;
+            const named = this.viewParams.named;
             // Accept if it names a single libpath or an array thereof.
-            if (typeof(named) === "string" && named !== 'all') {
+            if (typeof(named) === "string" && named !== '<all>') {
                 selection = named;
             } else if (Array.isArray(named)) {
                 selection = named;

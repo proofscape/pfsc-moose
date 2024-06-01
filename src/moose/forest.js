@@ -423,8 +423,8 @@ Forest.prototype = {
         if (mode !== this.expansionMode) {
             this.expansionMode = mode;
             return this.requestState({
-                reload: 'all',
-                view: 'all',
+                reload: '<all>',
+                view: '<all>',
             });
         } else {
             return Promise.resolve();
@@ -1156,7 +1156,7 @@ Forest.prototype = {
         var deducs = this.listEssentialOpenDeducs();
         this.closeAllInstantaneously();
         this.requestState({
-            on_board: deducs,
+            onBoard: deducs,
             coords: 'fixed',
             select: true,
             transition: false
@@ -1171,8 +1171,8 @@ Forest.prototype = {
      *   - the current selection
      *   - the current layout method
      *
-     * param includeSpecial: set truthy to include deducs in `on_board` whose UIDs begin with `special.`.
-     *  Otherwise all such deducs are excluded from `on_board`.
+     * param includeSpecial: set truthy to include deducs in `onBoard` whose UIDs begin with `special.`.
+     *  Otherwise all such deducs are excluded from `onBoard`.
      */
     describeState : function(includeSpecial) {
         var deducs = this.listEssentialOpenDeducs();
@@ -1187,12 +1187,12 @@ Forest.prototype = {
         const ordSel = selection.length === 1 ?
                        this.uidToSortOrder(selection[0]) : -1;
 
-        var on_board = includeSpecial ?
+        var onBoard = includeSpecial ?
                        deducs.slice() :
                        deducs.filter(uid => uid.slice(0, 8) !== 'special.');
 
         return {
-            on_board: on_board,
+            onBoard: onBoard,
             coords: coords,
             select: selection,
             ordSel: ordSel,
