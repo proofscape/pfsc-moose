@@ -1,4 +1,4 @@
-## next (------)
+## 0.24.0 (240601)
 
 Breaking Changes:
 
