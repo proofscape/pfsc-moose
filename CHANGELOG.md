@@ -1,3 +1,17 @@
+## next (------)
+
+Breaking Changes:
+
+* Parameter names for transition controls are uniformized to
+  lower-camel-case.
+* The `view` transition parameter is split into `view` and `viewOpts`.
+* The `select` parameter accepts `false` instead of `null`.
+
+Bug Fixes:
+
+* Boxlisting keywords must always have angle brackets.
+
+
 ## 0.23.1 (230425)
 
 Enhancements:
